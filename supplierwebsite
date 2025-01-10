@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Ordering System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* Set background image */
+            background-image: url('https://i.pinimg.com/originals/b0/f9/2e/b0f92e2ab903c9709d8f82433e1664e7.jpg'); /* Replace 'background_image.jpg' with the path to your image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+            border: 2px solid #FFB6C1;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent white background for better readability */
+        }
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            width: 40%;
+            border: 2px solid #FFB6C1;
+            padding: 20px;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            border-bottom: 1px solid #FFB6C1;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        
+        .enter-choice { /* Changed class name from orderlist to enter-choice */
+            display: flex;
+            flex-direction: column;
+            width: 40%;
+            border: 2px solid #FFB6C1;
+            padding: 20px;
+        }
+        .enter-choice-item { /* Changed class name from orderlist-item to enter-choice-item */
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            border-bottom: 1px solid #FFB6C1;
+            padding: 5px 0;
+        }
+        .total {
+            margin: 20px 0;
+        }
+        .order-details {
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #FFB6C1;
+            padding: 20px;
+            width: 20%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+         <div class="order-details">
+            <label for="orders">How many orders:</label>
+            <input type="number" id="orders" min="1" />
+            <label for="order-again">Want to order again? (YES or NO)</label>
+            <input type="text" id="order-again" />
+            <div class="total">
+                <span>Total=</span>
+                <span id="total">₱0.00</span>
+            </div>
+            <div class="tender">
+                 <label for="tender-cash">Tender Cash:</label>
+                 <input type="number" id="tender-cash" min="1" />
+            </div>
+            <div class="change">
+                <span>Change:</span>
+                <span id="change">₱0.00</span>
+            </div>
+            <button id="checkout">Checkout</button>
+        </div>
+        <div class="menu-list" id="dishes">
+            <h2>Dishes</h2>
+            <div class="menu-item" data-name="Egg" data-price="10.00">
+                <span>Egg - ₱10.00</span>
+            </div>
+            <div class="menu-item" data-name="Pakbet" data-price="15.00">
+                <span>Pakbet - ₱15.00</span>
+            </div>
+            <div class="menu-item" data-name="Menudo" data-price="25.00">
+                <span>Menudo - ₱25.00</span>
+            </div>
+            <div class="menu-item" data-name="Tinolang Manok" data-price="20.00">
+                <span>Tinolang Manok - ₱20.00</span>
+            </div>
+            <div class="menu-item" data-name="Pritong Isda" data-price="25.00">
+                <span>Pritong Isda - ₱25.00</span>
+            </div>
+            <div class="menu-item" data-name="Adobo" data-price="25.00">
+              <span>Adobo - ₱25.00</span>
+            </div>
+            <div class="menu-item" data-name="Humba" data-price="30.00">
+                <span>Humba - ₱30.00</span>
+            </div>
+        </div>
+        <div class="menu-list" id="drinks">
+            <h2>Drinks</h2>
+            <div class="menu-item" data-name="Bottle Water" data-price="20.00">
+                <span>Bottle Water - ₱20.00</span>
+            </div>
+            <div class="menu-item" data-name="Coke" data-price="20.00">
+                <span>Coke - ₱20.00</span>
+            </div>
+            <div class="menu-item" data-name="Sprite" data-price="20.00">
+                <span>Sprite - ₱20.00</span>
+            </div>
+        </div>
+        <div class="enter-choice"> <!-- Changed class name to enter-choice -->
+            <h2>Enter Your Choice</h2> <!-- Changed heading -->
+            <div class="enter-choice-items" id="orderlist-items"></div> <!-- Changed class name -->
+            <div class="enter-choice-total" id="orderlist-total"></div> <!-- Changed class name -->
+        </div>
+    </div>
+
+    <script>
+        const menuItems = document.querySelectorAll('.menu-item');
+        const orderlistItems = document.getElementById('orderlist-items');
+        const orderlistTotal = document.getElementById('orderlist-total');
+        const total = document.getElementById('total');
+        const checkoutBtn = document.getElementById('checkout');
+        let orderlist = [];
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const name = item.dataset.name;
+                const price = parseFloat(item.dataset.price);
+
+                const index = orderlist.findIndex(i => i.name === name);
+
+                if (index === -1) {
+                    orderlist.push({ name, price, quantity: 1 });
+                } else {
+                    orderlist[index].quantity++;
+                }
+
+                updateOrderlist();
+            });
+        });
+
+        function updateOrderlist() {
+            orderlistItems.innerHTML = '';
+            let totalPrice = 0;
+
+            orderlist.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('enter-choice-item'); // Corrected class name
+                div.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>₱${item.price.toFixed(2)}</span>
+                    <span>${item.quantity}</span>
+                    <button class="remove-item" data-name="${item.name}">Remove</button>
+                `;
+                orderlistItems.appendChild(div);
+
+                totalPrice += item.price * item.quantity;
+            });
+
+            total.innerText = "₱" + totalPrice.toFixed(2);
+
+            const removeButtons = document.querySelectorAll('.remove-item');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const name = button.dataset.name;
+                    orderlist = orderlist.filter(item => item.name !== name);
+                    updateOrderlist();
+                });
+            });
+
+            updateOrderDetails();
+        }
+
+        checkoutBtn.addEventListener('click', () => {
+            if (orderlist.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const choices = orderlist.map(item => item.name);
+            const quantities = orderlist.map(item => item.quantity);
+            const totalPrice = parseFloat(total.innerText.replace('₱', ''));
+
+            // Display receipt
+            const receipt = `
+                Order:
+                Choices: ${choices.join(', ')}
+                Quantities: ${quantities.join(', ')}
+                Total Price: ₱${totalPrice.toFixed(2)}
+            `;
+            alert(receipt);
+
+            // Clear the orderlist after the order is successfully placed.
+            orderlist = [];
+            updateOrderlist();
+
+            // Update order details
+            const ordersInput = document.getElementById('orders');
+            const orderAgainInput = document.getElementById('order-again');
+            const tenderCashInput = document.getElementById('tender-cash');
+
+            ordersInput.value = '';
+            orderAgainInput.value = '';
+            tenderCashInput.value = '';
+
+            updateOrderDetails();
+
+            // Display thank you message
+            alert('THANK YOU AND COME AGAIN');
+        });
+
+        function updateOrderDetails() {
+            const orders = parseInt(document.getElementById('orders').value, 10) || 0;
+            const tenderCash = parseFloat(document.getElementById('tender-cash').value) || 0;
+
+            const subtotal = parseFloat(total.innerText.replace('₱', '')) || 0;
+            const totalPrice = subtotal * orders;
+            const change = tenderCash - totalPrice;
+
+            document.getElementById('total').innerText = "₱" + totalPrice.toFixed(2);
+            document.getElementById('change').innerText = "₱" + (change >= 0 ? change.toFixed(2) : 0); // Ensure change is not negative
+        }
+
+        // Initialize order details
+        updateOrderDetails();
+    </script>
+</body>
+</html
